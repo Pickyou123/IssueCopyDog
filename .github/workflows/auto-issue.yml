@@ -1,5 +1,10 @@
 name: Auto Submit Issues to go-music-dl
 
+# 添加这段权限配置
+permissions:
+  issues: write
+  contents: read
+
 on:
   schedule:
     - cron: '0 */3 * * *'
