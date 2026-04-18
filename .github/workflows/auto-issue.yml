@@ -1,0 +1,38 @@
+name: Auto Submit Issues to go-music-dl
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'
+  workflow_dispatch:
+
+jobs:
+  submit-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read issue content from txt file
+        id: read_issue
+        run: |
+          if [ -f "issues.txt" ]; then
+            ISSUE_TITLE=$(head -n 1 issues.txt)
+            ISSUE_BODY=$(tail -n +2 issues.txt)
+            echo "title=$ISSUE_TITLE" >> $GITHUB_OUTPUT
+            echo "body<<EOF" >> $GITHUB_OUTPUT
+            echo "$ISSUE_BODY" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "issues.txt not found!"
+            exit 1
+          fi
+
+      - name: Submit issue to go-music-dl
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/guohuiyuan/go-music-dl/issues \
+            -d "{\"title\":\"${{ steps.read_issue.outputs.title }}\",\"body\":\"${{ steps.read_issue.outputs.body }}\"}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
