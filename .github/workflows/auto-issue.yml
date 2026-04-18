@@ -1,6 +1,5 @@
 name: Auto Submit Issues to go-music-dl
 
-# 添加这段权限配置
 permissions:
   issues: write
   contents: read
@@ -35,9 +34,9 @@ jobs:
       - name: Submit issue to go-music-dl
         run: |
           curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/guohuiyuan/go-music-dl/issues \
             -d "{\"title\":\"${{ steps.read_issue.outputs.title }}\",\"body\":\"${{ steps.read_issue.outputs.body }}\"}"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
